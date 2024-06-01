@@ -1,0 +1,18 @@
+# Dependencies
+node_modules
+
+# Build files
+dist
+
+# Environment variables
+.env
+
+# Seeders & Json
+src/db/seeds/create_cars.ts
+cars.json
+
+# IDE/Editor files
+.vscode
+*.code-workspace
+
+
