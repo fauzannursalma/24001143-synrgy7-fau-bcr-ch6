@@ -83,15 +83,6 @@ export class CarRepository {
     return await queryBuilder;
   }
 
-  async listDeleted() {
-    return CarsModel.query()
-      .whereNotNull("deleted_at")
-      .withGraphFetched("[deleter]")
-      .modifyGraph("deleter", (builder) => {
-        builder.select("name", "email");
-      });
-  }
-
   async show(id: string): Promise<any> {
     const car = await CarsModel.query()
       .findById(id)
@@ -139,9 +130,23 @@ export class CarRepository {
     return cars;
   }
 
+  async trash() {
+    const cars = await CarsModel.query()
+      .whereNotNull("deleted_by")
+      .withGraphFetched("[deleter]")
+      .modifyGraph("deleter", (builder) => {
+        builder.select("name", "email");
+      });
+
+    if (!cars || cars.length === 0) {
+      throw new Error("No trashed cars found");
+    }
+
+    return cars;
+  }
+
   async restore(id: string) {
     return CarsModel.query().findById(id).patch({
-      updated_at: new Date(),
       deleted_by: "",
     });
   }

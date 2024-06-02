@@ -90,6 +90,10 @@ export class UserController {
     res: Response
   ): Promise<void> {
     try {
+      if (!req.body) {
+        ResponseHelper.error("All fields are required", null, 400)(res);
+        return;
+      }
       const user = await this.userService.register(req.body);
 
       const payload = {
@@ -108,6 +112,11 @@ export class UserController {
     res: Response
   ): Promise<void> {
     try {
+      if (!req.body) {
+        ResponseHelper.error("All fields are required", null, 400)(res);
+        return;
+      }
+
       const user = await this.userService.login(
         req.body.email,
         req.body.password

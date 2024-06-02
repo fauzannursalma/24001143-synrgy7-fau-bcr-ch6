@@ -7,6 +7,9 @@ dist
 # Environment variables
 .env
 
+# Archive files
+archive
+
 # Seeders & Json
 src/db/seeds/create_cars.ts
 cars.json

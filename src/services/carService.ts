@@ -6,6 +6,8 @@ import {
 } from "../utils/cloudinaryImageUtils";
 import { carsPublic } from "../utils/dataColumnUtils";
 import { up } from "../db/migrations/20240601010404_create_users_table";
+import { randomUUID } from "crypto";
+import { el } from "@faker-js/faker";
 
 export class CarService {
   private carRepository: CarRepository;
@@ -38,6 +40,7 @@ export class CarService {
     if (image) {
       const result = await uploadImageToCloudinary(image, "cars");
       carPayload = {
+        id: randomUUID(),
         ...car,
         image_public_id: result.public_id,
         image: result.secure_url,
@@ -90,6 +93,12 @@ export class CarService {
   async delete(id: string, userId: string) {
     const carInDB = await this.carRepository.show(id);
 
+    if (!carInDB) {
+      throw new Error("Car not found");
+    } else if (carInDB.deleted_at != null) {
+      throw new Error("Car already deleted");
+    }
+
     if (carInDB.image != null && carInDB.image_public_id != null) {
       await deleteImageFromCloudinary(carInDB.image_public_id as string);
 
@@ -102,8 +111,9 @@ export class CarService {
     return this.carRepository.restore(id);
   }
 
-  async listDeleted() {
-    return this.carRepository.listDeleted();
+  async trash() {
+    const cars = await this.carRepository.trash();
+    return cars;
   }
 }
 
